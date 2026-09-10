@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A playful browser demo of the Laugh GitHub Copilot skill.">
+  <title>Laugh - Joke Playground</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&amp;family=Fugaz+One&amp;display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+  <style>
+    :root {
+      --paper: #fff6d8;
+      --ink: #171717;
+      --red: #ee4b3e;
+      --blue: #31b7c5;
+      --yellow: #ffd447;
+      --white: #fffdf7;
+      --shadow: 8px 8px 0 var(--ink);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image:
+        linear-gradient(rgba(23, 23, 23, .06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 23, 23, .06) 1px, transparent 1px);
+      background-size: 28px 28px;
+      font-family: "DM Sans", sans-serif;
+    }
+
+    button { font: inherit; }
+
+    .shell {
+      width: min(1080px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 44px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: clamp(38px, 8vh, 84px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      background: var(--yellow);
+      border: 2px solid var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+
+    .brand-name {
+      font-family: "Fugaz One", sans-serif;
+      font-size: 1.25rem;
+    }
+
+    .repo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(220px, .68fr) minmax(0, 1.32fr);
+      gap: clamp(28px, 6vw, 76px);
+      align-items: center;
+    }
+
+    .intro h1 {
+      max-width: 8ch;
+      margin: 0 0 20px;
+      font-family: "Fugaz One", sans-serif;
+      font-size: clamp(3.4rem, 8vw, 7rem);
+      line-height: .92;
+    }
+
+    .intro h1 span {
+      display: block;
+      color: var(--red);
+      -webkit-text-stroke: 2px var(--ink);
+      text-shadow: 5px 5px 0 var(--yellow);
+    }
+
+    .intro p {
+      max-width: 34ch;
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+
+    .playground {
+      min-width: 0;
+    }
+
+    .topic-label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: .8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .topics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .topic {
+      min-height: 40px;
+      padding: 8px 14px;
+      color: var(--ink);
+      background: var(--white);
+      border: 2px solid var(--ink);
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .topic[aria-pressed="true"] {
+      color: var(--white);
+      background: var(--ink);
+    }
+
+    .joke-card {
+      position: relative;
+      display: flex;
+      min-height: 300px;
+      padding: clamp(28px, 6vw, 54px);
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--white);
+      border: 3px solid var(--ink);
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .joke-card::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 76px;
+      height: 14px;
+      content: "";
+      background: var(--blue);
+      border-right: 3px solid var(--ink);
+      border-bottom: 3px solid var(--ink);
+    }
+
+    #joke {
+      margin: 12px 0 36px;
+      font-size: clamp(1.55rem, 3.5vw, 2.45rem);
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .primary,
+    .icon-button {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink);
+      background: var(--yellow);
+      border: 2px solid var(--ink);
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 var(--ink);
+      font-weight: 700;
+    }
+
+    .primary { gap: 9px; padding: 10px 18px; }
+    .icon-actions { display: flex; gap: 8px; }
+    .icon-button { width: 48px; padding: 0; background: var(--white); }
+
+    button:hover { transform: translate(-1px, -1px); }
+    button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+    button:focus-visible, a:focus-visible { outline: 4px solid var(--blue); outline-offset: 3px; }
+
+    .toast {
+      min-height: 24px;
+      margin: 18px 0 0;
+      color: #4b4b4b;
+      font-size: .9rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 720px) {
+      .shell { padding-top: 20px; }
+      header { margin-bottom: 48px; }
+      .repo-link span { display: none; }
+      main { grid-template-columns: 1fr; }
+      .intro h1 { max-width: none; font-size: clamp(3rem, 17vw, 5rem); }
+      .intro p { display: none; }
+      .joke-card { min-height: 310px; padding: 30px 24px 24px; }
+      #joke { font-size: clamp(1.45rem, 7vw, 2rem); }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .intro, .playground { animation: rise .5s ease-out both; }
+      .playground { animation-delay: .12s; }
+      #joke.refreshing { animation: swap .24s ease-out; }
+      @keyframes rise { from { opacity: 0; transform: translateY(16px); } }
+      @keyframes swap { from { opacity: 0; transform: translateY(8px); } }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <a class="brand" href="./" aria-label="Laugh playground home">
+        <span class="brand-mark"><i data-lucide="laugh" aria-hidden="true"></i></span>
+        <span class="brand-name">LAUGH</span>
+      </a>
+      <a class="repo-link" href="https://github.com/sonalkum-maker/Jokes-skill" target="_blank" rel="noreferrer">
+        <i data-lucide="github" aria-hidden="true"></i>
+        <span>View the skill</span>
+      </a>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <h1 id="page-title">JOKE <span>SHOP</span></h1>
+        <p>A tiny, no-cost playground inspired by the Laugh skill for GitHub Copilot.</p>
+      </section>
+
+      <section class="playground" aria-label="Joke generator">
+        <span class="topic-label">Pick a topic</span>
+        <div class="topics" role="group" aria-label="Joke topic">
+          <button class="topic" type="button" data-topic="any" aria-pressed="true">Surprise me</button>
+          <button class="topic" type="button" data-topic="tech" aria-pressed="false">Tech</button>
+          <button class="topic" type="button" data-topic="work" aria-pressed="false">Work</button>
+          <button class="topic" type="button" data-topic="food" aria-pressed="false">Food</button>
+        </div>
+
+        <article class="joke-card">
+          <p id="joke" aria-live="polite">I told my computer I needed a break. Now it will not stop sending me vacation ads.</p>
+          <div class="actions">
+            <button class="primary" id="new-joke" type="button">
+              <i data-lucide="sparkles" aria-hidden="true"></i>
+              New joke
+            </button>
+            <div class="icon-actions">
+              <button class="icon-button" id="copy-joke" type="button" title="Copy joke" aria-label="Copy joke">
+                <i data-lucide="copy" aria-hidden="true"></i>
+              </button>
+              <button class="icon-button" id="share-joke" type="button" title="Share joke" aria-label="Share joke">
+                <i data-lucide="share-2" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+        <p class="toast" id="status" role="status"></p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const jokes = [
+      { topic: "tech", text: "Why did the developer go broke? They used up all their cache." },
+      { topic: "tech", text: "I named my Wi-Fi 'The Promised LAN.' It still takes forty years to connect." },
+      { topic: "tech", text: "My code does not have bugs. It develops unexpected side quests." },
+      { topic: "tech", text: "The database and I are taking a break. There were too many unresolved relationships." },
+      { topic: "work", text: "My boss told me to have a good day, so I went home." },
+      { topic: "work", text: "I put 'excellent at multitasking' on my resume. I can waste time, be unproductive, and procrastinate all at once." },
+      { topic: "work", text: "The meeting could have been an email, but the email wanted witnesses." },
+      { topic: "work", text: "I love deadlines. Especially the quiet whooshing sound they make as they pass." },
+      { topic: "food", text: "I tried to organize a hide-and-seek tournament, but good players are hard to find." },
+      { topic: "food", text: "The baker stopped making doughnuts. He was tired of the hole business." },
+      { topic: "food", text: "I asked the waiter how they prepared the chicken. He said, 'Nothing special. We just tell it that its time has come.'" },
+      { topic: "food", text: "My sandwich started a podcast. It already has several layers of content." }
+    ];
+
+    const jokeElement = document.querySelector("#joke");
+    const statusElement = document.querySelector("#status");
+    const topicButtons = [...document.querySelectorAll(".topic")];
+    let activeTopic = "any";
+    let currentIndex = -1;
+
+    function filteredJokes() {
+      return jokes.map((joke, index) => ({ ...joke, index }))
+        .filter(joke => activeTopic === "any" || joke.topic === activeTopic);
+    }
+
+    function showNewJoke() {
+      const choices = filteredJokes().filter(joke => joke.index !== currentIndex);
+      const choice = choices[Math.floor(Math.random() * choices.length)];
+      currentIndex = choice.index;
+      jokeElement.textContent = choice.text;
+      statusElement.textContent = "";
+      jokeElement.classList.remove("refreshing");
+      void jokeElement.offsetWidth;
+      jokeElement.classList.add("refreshing");
+    }
+
+    async function copyJoke() {
+      await navigator.clipboard.writeText(jokeElement.textContent);
+      statusElement.textContent = "Copied to clipboard.";
+    }
+
+    async function shareJoke() {
+      if (navigator.share) {
+        await navigator.share({ title: "Laugh", text: jokeElement.textContent, url: location.href });
+        return;
+      }
+      await copyJoke();
+      statusElement.textContent = "Copied. Paste it anywhere to share.";
+    }
+
+    topicButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        activeTopic = button.dataset.topic;
+        topicButtons.forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+        showNewJoke();
+      });
+    });
+
+    document.querySelector("#new-joke").addEventListener("click", showNewJoke);
+    document.querySelector("#copy-joke").addEventListener("click", () => copyJoke().catch(() => {
+      statusElement.textContent = "Copy is unavailable in this browser.";
+    }));
+    document.querySelector("#share-joke").addEventListener("click", () => shareJoke().catch(() => {}));
+    window.addEventListener("DOMContentLoaded", () => window.lucide?.createIcons());
+  </script>
+</body>
+</html>
